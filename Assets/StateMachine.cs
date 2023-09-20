@@ -96,7 +96,11 @@ public class StateMachine {
     public void ChangeState(String newStateName)
     {
         Debug.Log("newState: "+newStateName);
-        if (states.ContainsKey(newStateName))
+        foreach (var kvp in states.Values)
+        {
+            Debug.Log($"Key: {kvp.Name}");
+        }
+        if (!states.ContainsKey(newStateName))
         {
             Debug.LogErrorFormat($"the state machine does not contain the state {newStateName}");
             return;

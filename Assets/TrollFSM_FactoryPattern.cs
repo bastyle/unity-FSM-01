@@ -37,7 +37,7 @@ public class TrollFSM_FactoryPattern : MonoBehaviour
         realignWayPoint.onExit = delegate { Debug.Log("realignWayPoint.onExit"); };
         realignWayPoint.onStay = delegate
         {
-            Debug.Log("realignWayPoint.onStay");
+            //Debug.Log("realignWayPoint.onStay");
             DoRealignWaypoint();
         };
 
@@ -48,7 +48,7 @@ public class TrollFSM_FactoryPattern : MonoBehaviour
         {
             Debug.Log("seekWayPoint.onStay");
             //DEFAULT ACTION
-            print("HandleSeekWaypoint");
+            //print("HandleSeekWaypoint");
             DoSeekWaypoint();
 
             //CHECK FOR  TRANSITIONS
@@ -59,10 +59,10 @@ public class TrollFSM_FactoryPattern : MonoBehaviour
                 stateMachine.ChangeState("RealignWaypoint");
             }
             //T2 - SeeEnemy?
-            if (Utilities.SeeEnemy(this.transform.position,enemy.transform.position,this.transform.forward,cosOfFOVover2InRAD))
+            /*if (Utilities.SeeEnemy(this.transform.position,enemy.transform.position,this.transform.forward,cosOfFOVover2InRAD))
             {
                 stateMachine.ChangeState("ChaseEnemy");
-            }
+            }*/
 
         };
 
@@ -82,15 +82,16 @@ public class TrollFSM_FactoryPattern : MonoBehaviour
     private void DoRealignWaypoint()
     {
         //DEFAULT
-        print("DoRealignWaypoint");
+        print("DoRealignWaypoint!!!!!!!");
         DoRealign();
 
         //TRANSITIONS
         //T1 - Aligned?
-        if (Utilities.IsAligned(this.transform.position,enemy.transform.position, this.transform.forward,0.01f))
+        //if (Utilities.IsAligned(this.transform.position, waypoints[nextWaypointIndex].position, this.transform.forward, 0.01f))
+        if(IsAligned())
         {
-            print("IsAligned.............");
-            stateMachine.ChangeState("SeekWaypoint");
+            print("IsAligned...........................");
+            stateMachine.ChangeState("SeekWayPoint");
         }
     }
 
@@ -115,6 +116,12 @@ public class TrollFSM_FactoryPattern : MonoBehaviour
         this.transform.rotation = Quaternion.LookRotation(newRotation);
     }
 
+
+    private void DoSeekWaypoint()
+    {
+
+        this.transform.position = Vector3.MoveTowards(this.transform.position, waypoints[nextWaypointIndex].position, maxSpeed * Time.deltaTime);
+    }
     private bool IsAligned()
     {
 
@@ -123,25 +130,6 @@ public class TrollFSM_FactoryPattern : MonoBehaviour
         headingToNextWP.Normalize();
         float diff = Vector3.Distance(headingToNextWP, this.transform.forward);
         if (diff < 0.01)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    private void DoSeekWaypoint()
-    {
-
-        this.transform.position = Vector3.MoveTowards(this.transform.position, waypoints[nextWaypointIndex].position, maxSpeed * Time.deltaTime);
-    }
-
-    private bool WaypointReached()
-    {
-
-        if (Vector3.Distance(this.transform.position, waypoints[nextWaypointIndex].position) < float.Epsilon)
         {
             return true;
         }
