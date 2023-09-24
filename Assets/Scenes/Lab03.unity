@@ -1215,7 +1215,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemy: {fileID: 1485168070}
-  maxSpeed: 6
+  maxSpeed: 2
   FOVinDEG: 70
   waypoints:
   - {fileID: 371512816}
