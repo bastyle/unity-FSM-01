@@ -171,7 +171,7 @@ public class TrollFSM : MonoBehaviour
     private void HandleSeekWaypoint()
     {
         //DEFAULT ACTION
-        print("HandleSeekWaypoint");
+        print("HandleSeekWaypoint::::::::");
         DoSeekWaypoint();
 
         //CHECK FOR  TRANSITIONS
@@ -254,8 +254,6 @@ public class TrollFSM : MonoBehaviour
 
     private void DoRealign()
     {
-        
-       
         //int i1 = (nextWaypointIndex + 1) % waypoints.Length;
         Vector3 headingToNextWP = waypoints[nextWaypointIndex].position-this.transform.position;
         headingToNextWP.Normalize();

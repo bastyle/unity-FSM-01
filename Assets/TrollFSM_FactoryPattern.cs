@@ -21,7 +21,7 @@ public class TrollFSM_FactoryPattern : MonoBehaviour
     public float maxAngularSpeedInDegPerSec = 60; //deg/sec
     public float maxAngularSpeedInRadPerSec; //rad/sec
     private float maxAngularSpeedInRadPerFrame;
-
+    private static string REALIGN_WAY_POINT = "RealignWayPoint";
     ///
 
 
@@ -32,7 +32,8 @@ public class TrollFSM_FactoryPattern : MonoBehaviour
         maxAngularSpeedInRadPerSec = maxAngularSpeedInDegPerSec * Mathf.Deg2Rad;
 
         stateMachine = new StateMachine();
-        StateMachine.State realignWayPoint = stateMachine.CreateState("RealignWayPoint");
+        
+        StateMachine.State realignWayPoint = stateMachine.CreateState(REALIGN_WAY_POINT);
         realignWayPoint.onEnter = delegate{ Debug.Log("realignWayPoint.onEnter"); };
         realignWayPoint.onExit = delegate { Debug.Log("realignWayPoint.onExit"); };
         realignWayPoint.onStay = delegate
@@ -56,7 +57,8 @@ public class TrollFSM_FactoryPattern : MonoBehaviour
             if (Utilities.WaypointReached(this.transform.position, waypoints[nextWaypointIndex].position))
             {
                 nextWaypointIndex = (nextWaypointIndex + 1) % waypoints.Length;
-                stateMachine.ChangeState("RealignWaypoint");
+                //stateMachine.ChangeState("RealignWaypoint");
+                stateMachine.ChangeState(REALIGN_WAY_POINT); 
             }
             //T2 - SeeEnemy?
             /*if (Utilities.SeeEnemy(this.transform.position,enemy.transform.position,this.transform.forward,cosOfFOVover2InRAD))
