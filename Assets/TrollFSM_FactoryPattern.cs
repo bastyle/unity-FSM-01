@@ -22,6 +22,9 @@ public class TrollFSM_FactoryPattern : MonoBehaviour
     public float maxAngularSpeedInRadPerSec; //rad/sec
     private float maxAngularSpeedInRadPerFrame;
     private static string REALIGN_WAY_POINT = "RealignWayPoint";
+    private static string CHASE_ENEMY = "ChaseEnemy";
+    private static string FIGHT_ENEMY = "FightEnemy";
+    private static string SEEW_WAY_POINT = "SeekWayPoint";
     ///
 
 
@@ -42,7 +45,7 @@ public class TrollFSM_FactoryPattern : MonoBehaviour
             DoRealignWaypoint();
         };
 
-        StateMachine.State seekWayPoint = stateMachine.CreateState("SeekWayPoint");
+        StateMachine.State seekWayPoint = stateMachine.CreateState(SEEW_WAY_POINT);
         seekWayPoint.onEnter = delegate { Debug.Log("seekWayPoint.onEnter"); };
         seekWayPoint.onExit = delegate { Debug.Log("seekWayPoint.onExit"); };
         seekWayPoint.onStay = delegate
@@ -61,24 +64,63 @@ public class TrollFSM_FactoryPattern : MonoBehaviour
                 stateMachine.ChangeState(REALIGN_WAY_POINT); 
             }
             //T2 - SeeEnemy?
-            /*if (Utilities.SeeEnemy(this.transform.position,enemy.transform.position,this.transform.forward,cosOfFOVover2InRAD))
+            if (Utilities.SeeEnemy(this.transform.position,enemy.transform.position,this.transform.forward,cosOfFOVover2InRAD))
             {
-                stateMachine.ChangeState("ChaseEnemy");
-            }*/
+                stateMachine.ChangeState(CHASE_ENEMY);
+            }
 
         };
 
-        StateMachine.State chaseEnemy = stateMachine.CreateState("ChaseEnemy");
+        StateMachine.State chaseEnemy = stateMachine.CreateState(CHASE_ENEMY);
         chaseEnemy.onEnter = delegate { Debug.Log("chaseEnemy.onEnter"); };
         chaseEnemy.onExit = delegate { Debug.Log("chaseEnemy.onExit"); };
-        chaseEnemy.onStay = delegate { Debug.Log("chaseEnemy.onStay"); };
+        chaseEnemy.onStay = delegate
+        {
+            Debug.Log("chaseEnemy.onStay");
+            HandleChaseEnemy();
 
-        StateMachine.State fightEnemy = stateMachine.CreateState("FightEnemy");
-        fightEnemy.onEnter = delegate { Debug.Log("fightEnemy.onEnter"); };
+        };
+
+        StateMachine.State fightEnemy = stateMachine.CreateState(FIGHT_ENEMY);
+        fightEnemy.onEnter = delegate
+        {
+            Debug.Log("fightEnemy.onEnter");
+            HandleFightEnemy();
+        };
         fightEnemy.onExit = delegate { Debug.Log("fightEnemy.onExit"); };
         fightEnemy.onStay = delegate { Debug.Log("fightEnemy.onStay"); };
 
 
+    }
+
+    private void HandleFightEnemy()
+    {
+        //DEFAULT ACTION
+        print("HandleFightEnemy");
+        DoFightEnemy();
+
+        //TRANSITION CHECKS
+        //T5 - Enemy Dead or Lost Sight
+        if (EnemyDeadOrLostSight())
+        {
+            //ChangeState(TrollState.RealignWaypoint);
+            stateMachine.ChangeState(REALIGN_WAY_POINT);
+
+        }
+        //T6 - dit>2
+        if (!CheckDistanceLess(2))
+        {
+            //ChangeState(TrollState.ChaseEnemy);
+            stateMachine.ChangeState(CHASE_ENEMY);
+        }
+
+    }
+
+    private void DoFightEnemy()
+    {
+        //throw new NotImplementedException();
+        int damage = UnityEngine.Random.Range(0, 100);
+        enemy.GetComponent<Health>().TakeDamage(damage);
     }
 
     private void DoRealignWaypoint()
@@ -148,6 +190,79 @@ public class TrollFSM_FactoryPattern : MonoBehaviour
         T2Eheading.Normalize();
         float cosTheta = Vector3.Dot(this.transform.forward, T2Eheading);
         return (cosTheta > cosOfFOVover2InRAD);
+    }
+
+    private void HandleChaseEnemy()
+    {
+        //DEFAULT
+        print("HandleChaseEnemy");
+        DoChaseEnemy();
+
+
+
+
+        //Check TRANSITIONS
+        //T3 - Check dist<=2
+        if (CheckDistanceLess(2.0f))
+        {
+            
+            stateMachine.ChangeState(FIGHT_ENEMY);
+            int damage = 10;
+            enemy.GetComponent<Health>().TakeDamage(damage);
+        }
+
+        //T5 - Check Enemy dead, or lost from sight
+        if (EnemyDeadOrLostSight())
+        {
+            //ChangeState(TrollState.SeekWaypoint);
+            stateMachine.CreateState(SEEW_WAY_POINT);
+
+        }
+    }
+
+    private bool CheckDistanceLess(float v)
+    {
+
+        if (Vector3.Distance(this.transform.position, enemy.transform.position) <= v)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+
+    }
+
+    private void DoChaseEnemy()
+    {
+        this.transform.position = Vector3.MoveTowards(this.transform.position, enemy.transform.position, maxSpeed * Time.deltaTime);
+    }
+
+    private bool EnemyDeadOrLostSight()
+    {
+
+        if (EnemyDead() || LostSight())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private bool LostSight()
+    {
+        return !SeeEnemy();
+    }
+
+    private bool EnemyDead()
+    {
+        //TODO: Add a Health.cs script to the enemy with a public method IsAlive
+        Health health = enemy.GetComponent<Health>();
+        bool alive = health.IsAlive();
+        return !alive;
     }
 
 
