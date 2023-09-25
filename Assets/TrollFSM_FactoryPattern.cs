@@ -98,8 +98,6 @@ public class TrollFSM_FactoryPattern : MonoBehaviour
         celebrate.onEnter = delegate
         {
             Debug.Log("celebrate.onEnter");
-            //transform.GetComponent<Rigidbody>().isKinematic=false;
-            //transform.GetComponent<Rigidbody>().
             Celebration();
         };
         celebrate.onExit = delegate { Debug.Log("celebrate.onExit"); };
