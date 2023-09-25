@@ -25,8 +25,12 @@ public class TrollFSM_FactoryPattern : MonoBehaviour
     private static string CHASE_ENEMY = "ChaseEnemy";
     private static string FIGHT_ENEMY = "FightEnemy";
     private static string SEEW_WAY_POINT = "SeekWayPoint";
+    private static string CELEBRATION = "Celebration";
     ///
+    public float celebrationTimer = 0;
+    public int secondsToCelebrate = 2;
 
+    public GameObject fireworkPrefab;
 
     // Start is called before the first frame update
     void Start()
@@ -90,7 +94,36 @@ public class TrollFSM_FactoryPattern : MonoBehaviour
         fightEnemy.onExit = delegate { Debug.Log("fightEnemy.onExit"); };
         fightEnemy.onStay = delegate { Debug.Log("fightEnemy.onStay"); };
 
+        StateMachine.State celebrate = stateMachine.CreateState(CELEBRATION);
+        celebrate.onEnter = delegate
+        {
+            Debug.Log("celebrate.onEnter");
+            //transform.GetComponent<Rigidbody>().isKinematic=false;
+            //transform.GetComponent<Rigidbody>().
+            Celebration();
+        };
+        celebrate.onExit = delegate { Debug.Log("celebrate.onExit"); };
+        celebrate.onStay = delegate { Debug.Log("celebrate.onStay"); };
 
+
+    }
+
+    private void Celebration()
+    {
+        celebrationTimer += Time.deltaTime;
+        int seconds = (int)celebrationTimer % 60;
+        if (seconds >= secondsToCelebrate)
+        {
+            stateMachine.ChangeState(REALIGN_WAY_POINT);
+            //transform.GetComponent<Rigidbody>().isKinematic = true;
+        }
+        else
+        { 
+            Debug.Log("1..........................................................");
+            GameObject fw = Instantiate (fireworkPrefab);
+            fw.transform.position = new Vector3(transform.position.x, transform.position.y+1, transform.position.z) ;
+            Destroy(fw, 1);
+        }
     }
 
     private void HandleFightEnemy()
@@ -103,8 +136,8 @@ public class TrollFSM_FactoryPattern : MonoBehaviour
         //T5 - Enemy Dead or Lost Sight
         if (EnemyDeadOrLostSight())
         {
-            //ChangeState(TrollState.RealignWaypoint);
-            stateMachine.ChangeState(REALIGN_WAY_POINT);
+            //stateMachine.ChangeState(REALIGN_WAY_POINT);
+            stateMachine.ChangeState(CELEBRATION);
 
         }
         //T6 - dit>2
@@ -119,7 +152,7 @@ public class TrollFSM_FactoryPattern : MonoBehaviour
     private void DoFightEnemy()
     {
         //throw new NotImplementedException();
-        int damage = UnityEngine.Random.Range(0, 100);
+        int damage = UnityEngine.Random.Range(0, 5);
         enemy.GetComponent<Health>().TakeDamage(damage);
     }
 
