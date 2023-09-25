@@ -68,7 +68,7 @@ public class TrollFSM_FactoryPattern : MonoBehaviour
                 stateMachine.ChangeState(REALIGN_WAY_POINT); 
             }
             //T2 - SeeEnemy?
-            if (Utilities.SeeEnemy(this.transform.position,enemy.transform.position,this.transform.forward,cosOfFOVover2InRAD))
+            if (null!=enemy && Utilities.SeeEnemy(this.transform.position,enemy.transform.position,this.transform.forward,cosOfFOVover2InRAD))
             {
                 stateMachine.ChangeState(CHASE_ENEMY);
             }

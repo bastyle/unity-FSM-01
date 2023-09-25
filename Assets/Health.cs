@@ -20,6 +20,7 @@ public class Health : MonoBehaviour
                 this.gameObject.SetActive(false);
                 print("PLAYER DIED!");
                 //Time.timeScale = 0f;
+                Destroy(this.gameObject);
             } 
         }
 
